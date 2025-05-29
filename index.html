@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Trivia Pokémon</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #fff176, #ffe082);
+      color: #333;
+      text-align: center;
+    }
+    #contenedor {
+      width: 90%;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #fffde7;
+      border-radius: 20px;
+      box-shadow: 0 0 15px rgba(255, 204, 0, 0.7);
+      animation: aparecer 1s ease-out;
+    }
+    h1 {
+      font-size: 36px;
+      color: #f57f17;
+      margin-bottom: 20px;
+      text-shadow: 1px 1px #fff9c4;
+    }
+    .pregunta {
+      font-size: 22px;
+      margin-bottom: 20px;
+      color: #f57f17;
+    }
+    .opciones button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-size: 17px;
+      font-weight: bold;
+      background-color: #fff176;
+      color: #5d4037;
+      transition: transform 0.2s, background 0.3s;
+      cursor: pointer;
+    }
+    .opciones button:hover {
+      background-color: #fff59d;
+      transform: scale(1.03);
+    }
+    #resultado {
+      margin-top: 20px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+    #siguiente {
+      margin-top: 20px;
+      padding: 10px 25px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      background-color: #f57f17;
+      color: #fff;
+      cursor: pointer;
+      display: none;
+      transition: all 0.3s;
+    }
+    #siguiente:hover {
+      background-color: #ef6c00;
+    }
+    @keyframes aparecer {
+      from { opacity: 0; transform: translateY(-30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div id="contenedor">
+    <h1>🎮 Trivia Pokémon</h1>
+    <div class="pregunta" id="pregunta"></div>
+    <div class="opciones" id="opciones"></div>
+    <div id="resultado"></div>
+    <button id="siguiente">Siguiente</button>
+  </div>
+
+  <script>
+    const preguntas = [
+      { pregunta: "¿Quién es el Pokémon número 25 en la Pokédex?", opciones: ["Charmander", "Bulbasaur", "Pikachu", "Meowth"], correcta: "Pikachu" },
+      { pregunta: "¿Cuál es el Pokémon inicial de tipo planta en Kanto?", opciones: ["Chikorita", "Bulbasaur", "Treecko", "Turtwig"], correcta: "Bulbasaur" },
+      { pregunta: "¿Cuántos tipos de Pokémon existen actualmente?", opciones: ["15", "18", "20", "16"], correcta: "18" },
+      { pregunta: "¿Qué Pokémon puede evolucionar con una Piedra Trueno?", opciones: ["Eevee", "Pichu", "Voltorb", "Magnemite"], correcta: "Eevee" },
+      { pregunta: "¿Quién es el rival de Ash en la región Kanto?", opciones: ["Paul", "Gary", "Tracey", "Brock"], correcta: "Gary" },
+      { pregunta: "¿Qué tipo es fuerte contra el tipo Psíquico?", opciones: ["Eléctrico", "Fuego", "Siniestro", "Volador"], correcta: "Siniestro" },
+      { pregunta: "¿Cuál de estos Pokémon es legendario?", opciones: ["Lucario", "Snorlax", "Articuno", "Gengar"], correcta: "Articuno" },
+      { pregunta: "¿Qué Pokémon es conocido como el clon de Mew?", opciones: ["Ditto", "Mewtwo", "Jirachi", "Genesect"], correcta: "Mewtwo" },
+      { pregunta: "¿Qué Pokémon tiene la habilidad 'Levitar'?", opciones: ["Gengar", "Flygon", "Weezing", "Todos"], correcta: "Todos" },
+      { pregunta: "¿Cómo se llama el Pokémon inicial de tipo agua de Johto?", opciones: ["Totodile", "Squirtle", "Mudkip", "Popplio"], correcta: "Totodile" },
+      { pregunta: "¿Cuál es la evolución final de Charmander?", opciones: ["Charmeleon", "Charizard", "Charcoal", "Charon"], correcta: "Charizard" },
+      { pregunta: "¿Qué Pokémon tipo eléctrico tiene forma de ratón?", opciones: ["Raichu", "Electabuzz", "Pikachu", "Plusle"], correcta: "Pikachu" },
+      { pregunta: "¿Cómo se llama el líder de gimnasio de tipo roca en Kanto?", opciones: ["Brock", "Misty", "Erika", "Koga"], correcta: "Brock" },
+      { pregunta: "¿Quién es el Pokémon legendario de tipo fuego de Kanto?", opciones: ["Moltres", "Zapdos", "Articuno", "Ho-Oh"], correcta: "Moltres" },
+      { pregunta: "¿Qué Pokémon tiene forma de globo y es de tipo fantasma?", opciones: ["Gengar", "Drifloon", "Gastly", "Haunter"], correcta: "Drifloon" },
+      { pregunta: "¿Cuál es el Pokémon inicial tipo fuego de Sinnoh?", opciones: ["Torchic", "Chimchar", "Cyndaquil", "Tepig"], correcta: "Chimchar" },
+      { pregunta: "¿Qué objeto permite evolucionar a Eevee en Vaporeon?", opciones: ["Piedra Agua", "Piedra Fuego", "Piedra Trueno", "Piedra Lunar"], correcta: "Piedra Agua" },
+      { pregunta: "¿Quién es el campeón de la Liga Pokémon en la región Kalos?", opciones: ["Leon", "Diantha", "Cynthia", "Steven"], correcta: "Diantha" },
+      { pregunta: "¿Cuál es el tipo opuesto a Dragón?", opciones: ["Siniestro", "Hada", "Fuego", "Volador"], correcta: "Hada" },
+      { pregunta: "¿Qué Pokémon es conocido como el dios creador?", opciones: ["Arceus", "Mew", "Rayquaza", "Giratina"], correcta: "Arceus" }
+    ];
+
+    let actual = 0;
+    let puntaje = 0;
+
+    const preguntaDiv = document.getElementById("pregunta");
+    const opcionesDiv = document.getElementById("opciones");
+    const resultadoDiv = document.getElementById("resultado");
+    const btnSiguiente = document.getElementById("siguiente");
+
+    function mostrarPregunta() {
+      const p = preguntas[actual];
+      preguntaDiv.textContent = `Pregunta ${actual + 1}: ${p.pregunta}`;
+      opcionesDiv.innerHTML = "";
+      resultadoDiv.textContent = "";
+      btnSiguiente.style.display = "none";
+
+      p.opciones.forEach(opcion => {
+        const btn = document.createElement("button");
+        btn.textContent = opcion;
+        btn.onclick = () => verificarRespuesta(opcion, p.correcta);
+        opcionesDiv.appendChild(btn);
+      });
+    }
+
+    function verificarRespuesta(seleccionada, correcta) {
+      if (seleccionada === correcta) {
+        resultadoDiv.textContent = "✅ ¡Correcto!";
+        puntaje++;
+      } else {
+        resultadoDiv.textContent = `❌ Incorrecto. La respuesta correcta es: ${correcta}`;
+      }
+      btnSiguiente.style.display = "inline-block";
+    }
+
+    btnSiguiente.onclick = () => {
+      actual++;
+      if (actual < preguntas.length) {
+        mostrarPregunta();
+      } else {
+        mostrarResultadoFinal();
+      }
+    };
+
+    function mostrarResultadoFinal() {
+      preguntaDiv.textContent = "🎉 ¡Trivia finalizada!";
+      opcionesDiv.innerHTML = "";
+      resultadoDiv.textContent = `Tu puntaje fue de ${puntaje} / ${preguntas.length}`;
+      btnSiguiente.style.display = "none";
+    }
+
+    mostrarPregunta();
+  </script>
+</body>
+</html>
